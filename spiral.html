@@ -68,9 +68,12 @@ init = (function() {
     return Math.pow(Math.pow(a[0]-b[0], 2) + Math.pow(a[1]-b[1], 2), 0.5);
   }
 
-  function harshContrast(x) { // (0,1) -> (0,1)
-    x = (Math.atan(5 * (2 * x - 1)) + (Math.PI / 2)) * 1.2 / Math.PI - 0.1;
+  function constrain(x) {
     return Math.max(0, Math.min(x, 1));
+  }
+
+  function harshContrast(x) { // (0,1) -> (0,1)
+    return constrain((Math.atan(5 * (2 * x - 1)) + (Math.PI / 2)) * 1.2 / Math.PI - 0.1);
   }
 
   // fn: a harsh contrast function
@@ -78,6 +81,12 @@ init = (function() {
   function variableContrastAdjust(fn, amount) {
     return function(x) {
       return amount * fn(x) + (1 - amount) * x;
+    };
+  }
+
+  function lightnessAdjust(fn, amount) {
+    return function(x) {
+      return constrain(fn(x) + amount);
     };
   }
 
@@ -95,7 +104,7 @@ init = (function() {
     };
   }
 
-  var contrastAdjust = memoize(variableContrastAdjust(harshContrast, 0.8), 0.01);
+  var contrastAdjust = memoize(variableContrastAdjust(lightnessAdjust(harshContrast, -0.1), 0.7), 0.01);
 
   function imageAdjustment(p) {
     var size = 2 * sampleRadius + 1;
@@ -136,7 +145,7 @@ init = (function() {
       context.drawImage(image, 0, 0, 300, 300);
       afterImageDraw();
     };
-    image.src = 'sample3.jpg';
+    image.src = 'sample1.jpg';
   };
 
 })();
