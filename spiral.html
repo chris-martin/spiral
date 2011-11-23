@@ -136,7 +136,7 @@ init = (function() {
       context.drawImage(image, 0, 0, 300, 300);
       afterImageDraw();
     };
-    image.src = 'sample1.jpg';
+    image.src = 'sample3.jpg';
   };
 
 })();
@@ -170,13 +170,8 @@ svg, canvas {
 </head>
 <body onload="init()">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <filter id="blur" x="0" y="0">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="0"/>
-    </filter>
-  </defs>
   <g transform="translate(150, 150)">
-    <path id="spiral" fill-opacity="1" fill-rule="evenodd" filter="url(#blur)"/>
+    <path id="spiral" fill-opacity="1" fill-rule="evenodd"/>
   </g>
 </svg>
 <canvas>Shit's all fucked up</canvas>
