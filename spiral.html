@@ -1,0 +1,97 @@
+<html>
+<head>
+<script>
+initSvg = (function() {
+
+  var doc;
+  var root;
+  var xmlns = 'http://www.w3.org/2000/svg'
+
+  function spiralPoints(args) {
+
+    args = args || {};
+
+    var angle = args.initialAngle || 0;
+    var radius = args.initialRadius || 0;
+    var radiusOffset = args.radiusOffset || 0;
+
+    var loopCondition;
+    if (args.maxRadius) {
+      var maxRadius = args.maxRadius;
+      loopCondition = function() { return radius < maxRadius; };
+    } else if (args.loops || args.maxAngle) {
+      var maxAngle = args.maxAngle || (2 * Math.PI * args.loops);
+      loopCondition = function() { return angle < maxAngle; };
+    } else {
+      throw 'spiral config lacks a terminating condition';
+    }
+
+    var points = [];
+    while (loopCondition()) {
+      var r = radius + radiusOffset;
+      points.push([ r * Math.cos(angle), r * Math.sin(angle) ]);
+      var inc = 10 / Math.max(radius, 50);
+      angle += inc;
+      radius += 1 * inc;
+    }
+    return points;
+
+  }
+
+  function spiralPath(args) {
+    args = args || {};
+    var points = spiralPoints(args);
+    if (args.reverse) points.reverse();
+    return points.map(function(p) { return p.join(','); }).join(' L ')
+  }
+
+  return function(evt) {
+    doc = evt.target.ownerDocument;
+    root = doc.documentElement;
+    spiral = doc.getElementById('spiral');
+    var maxRadius = 150 * Math.pow(2, .5);
+    spiral.setAttribute('d', 'M ' + spiralPath({ maxRadius: maxRadius }) 
+                          + ' L ' + spiralPath({ maxRadius: maxRadius, radiusOffset: 1, reverse: true }));
+  };
+
+})();
+initCanvas = (function() {
+
+  var canvas;
+  var context;
+
+  return function() {
+    canvas = document.getElementsByTagName('canvas')[0];
+    context = canvas.getContext('2d');
+    canvas.width = 300;
+    canvas.height = 300;
+    var image = new Image();
+    image.onload = function() {
+      context.drawImage(image, 0, 0, 300, 300);
+    };
+    image.src = 'sample.jpg';
+  };
+
+})();
+</script>
+<style>
+body {
+  background-color: #003366;
+}
+svg, canvas { 
+  background-color: white;
+  border: 1px solid black;
+  width: 300px;
+  height: 300px;
+}
+</style>
+</head>
+<body onload="initCanvas()">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" onload="initSvg(evt)">
+  <g transform="translate(150, 150)">
+    <path id="spiral" fill-opacity="1" fill-rule="evenodd"/>
+  </g>
+</svg>
+<canvas>Shit's all fucked up</canvas>
+</body>
+</html>
